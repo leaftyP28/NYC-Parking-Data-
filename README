@@ -1,0 +1,59 @@
+After having my Elasticsearch domain created, as well as my EC2 instance started
+I ran the session manager to start working
+Then I input --> "sudo su" to begin inside my aws
+after that I ran --> source ./run-file-browser to activate the file-browser
+
+The project01 folder contains my Dockerfile and requirements.txt
+Then inside the src folder I have my main.py and config.py and elastic_helper.py
+I split the data into 3 .py files because it is easier to look at
+
+Since main.py is inside the src file
+Dockerfile's ENTRYPOINT would be ["python","src/main.py"] for it to work
+
+To build my docker, I used:
+    docker build -t parking:1.0 .
+    
+To run the docker, I used:
+    docker run \
+-v ${PWD}:/app \
+-e APP_TOKEN=cJNbk85wZf3AEMEAwwvCuTTty \
+-e ES_HOST=[HOST LINK] \
+-e ES_PASSWORD=[PASSWORD] \
+parking:1.0 --page_size=10000 --num_pages=100000
+
+When I confirmed that my num_pages and the page_size is working,
+I proceeded with using parking:1.0 10,000 10
+then when I am done with my run I would change the starting point by adding that number to the code 
+with that I can parse arguments again and have my data run as many times as I would like1
+
+Another thing that is changed in my main.py is that I put all of steps 2,3,4 into one big loop
+this loop is what allows my iteration to load by itself according to the range that I input
+then the data would all get loaded into Kibana
+
+argparse is incorporated to allow the use case of --page_size and --num_pages
+
+Another imoportant is that when I am converting my issue_date data to the correct format,
+I had to convert it back to a string again so that it would be able to go through json()
+Then I had my issue_date mapped to date type for Kibana
+
+-----------------------------------------------------------------------------------------------
+
+The Four Visualizations Created:
+
+--> Violations over Time - this graph is supposed to show overall captured violations over time
+                        it is overlapped with the moving average line to smooth out and reduce 
+                        short-term fluctuations.
+--> Area Graph by County - this graph is basically a stacked graph that is split into different
+                        counties with high amounts of data in volume. This will be able to show
+                        a good comparison for the violations by different counties and help us
+                        understand patterns and trends in these separate counties. Since it is
+                        created with dates for one of its axis, the data can show us the
+                        time relevant data for high-times, and low-times.
+--> Top Counties with Violations - I made this pie graph because I like how easy and simple it
+                        shows instant data for me as opposed to the area graphs. It tells me 
+                        the percentages for the violations made in these specific counties 
+                        which is easy to see and make judgements even though it doesn't show
+                        the actual count or other more specific information.
+--> Top 10 Violations - this is a tag cloud that I created to show emphasis on the most recent
+                        top 10 key violations that are made. It will change according to the 
+                        captured data and will display the highest 10 in rank.
